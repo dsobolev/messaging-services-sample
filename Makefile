@@ -1,12 +1,15 @@
+DOCKER_COMP = docker compose
+PHP_CONT = $(DOCKER_COMP) exec php
+
 start:
-	docker compose up
+	@$(DOCKER_COMP) up
 
 stop:
-	docker compose down
+	@$(DOCKER_COMP) down
 
 services:
-	docker compose ps
+	@$(DOCKER_COMP) ps
 
 db-shell:
-	docker compose exec product-db sh
+	@$(DOCKER_COMP) exec product-db sh
 
