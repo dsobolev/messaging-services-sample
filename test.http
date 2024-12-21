@@ -1,4 +1,4 @@
-@product_port=8080
+@product_port=8081
 
 ### Get products
 GET http://product.svc.local:{{product_port}}/products
