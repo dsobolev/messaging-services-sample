@@ -14,20 +14,20 @@ class Product
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
-    private ?Uuid $id;
+    private Uuid $id;
 
     #[ORM\Column]
-    private ?float $price;
+    private float $price;
 
     #[ORM\Column(length: 30)]
-    private ?string $name;
+    private string $name;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Inventory $inventory = null;
+    private Inventory $inventory;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Income $income = null;
 
     public function getId(): ?Uuid
