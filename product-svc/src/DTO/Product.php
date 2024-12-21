@@ -7,10 +7,10 @@ use Symfony\Component\Uid\Uuid;
 class Product
 {
     public function __construct(
-        public Uuid $id,
-        public string $name,
-        public float $price,
-        public float $qty,
-        public float $income = 0
+        public readonly Uuid $id,
+        public readonly string $name,
+        public readonly float $price,
+        public readonly float $qty,
+        public readonly float $income = 0
     ){}
 }
