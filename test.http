@@ -1,0 +1,14 @@
+@product_port=8080
+
+### Get products
+GET http://product.svc.local:{{product_port}}/products
+
+### Create product
+POST http://product.svc.local:{{product_port}}/products
+content-type: application/json
+
+{
+    "name": "Test product #1",
+    "price": 3.99,
+    "qty": 10
+}
