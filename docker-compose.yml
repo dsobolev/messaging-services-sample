@@ -13,8 +13,7 @@ services:
 
   product-app:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ./docker
     volumes:
       - ./product-svc:/var/www
     working_dir: /var/www
