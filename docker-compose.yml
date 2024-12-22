@@ -17,8 +17,6 @@ services:
     volumes:
       - ./product-svc:/var/www
     working_dir: /var/www
-    # ports:
-    #   - 9001:9000
     depends_on:
       - product-db
     networks:
@@ -58,10 +56,24 @@ services:
     volumes:
       - ./orders-svc:/var/www
     working_dir: /var/www
-    # ports:
-    #   - 9001:9000
-    # depends_on:
-    #   - orders-db
+    depends_on:
+      - orders-db
+    networks:
+      - orders-network
+
+  orders-db:
+    image: mariadb:11.6.2
+    restart: always
+    ports:
+      - ${ORDERS_DB_PORT}:3306
+    volumes:
+      - ./orders-svc/var/db:/var/lib/mysql:rw
+    environment:
+      MYSQL_DATABASE: ${ORDERS_DB_NAME}
+      MYSQL_USER: ${ORDERS_DB_USER}
+      MYSQL_PASSWORD: ${ORDERS_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ''
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
     networks:
       - orders-network
 
