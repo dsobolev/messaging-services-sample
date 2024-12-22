@@ -40,33 +40,33 @@ services:
     networks:
       - product-network
 
-  catalog-web:
+  orders-web:
     image: nginx:alpine
     ports:
-      - ${CATALOG_API_PORT}:80
+      - ${ORDERS_API_PORT}:80
     volumes:
-      - ./catalog-svc/:/var/www
-      - ./catalog-svc/docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./orders-svc/:/var/www
+      - ./orders-svc/docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
-      - catalog-app
+      - orders-app
     networks:
-      - catalog-network
+      - orders-network
 
-  catalog-app:
+  orders-app:
     build:
       context: ./docker
     volumes:
-      - ./catalog-svc:/var/www
+      - ./orders-svc:/var/www
     working_dir: /var/www
     # ports:
     #   - 9001:9000
     # depends_on:
-    #   - catalog-db
+    #   - orders-db
     networks:
-      - catalog-network
+      - orders-network
 
 networks:
   product-network:
     driver: bridge
-  catalog-network:
+  orders-network:
     driver: bridge
