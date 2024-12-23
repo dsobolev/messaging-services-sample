@@ -10,6 +10,7 @@ services:
       - product-app
     networks:
       - product-network
+      - api-orders-to-product-network
 
   product-app:
     build:
@@ -60,6 +61,7 @@ services:
       - orders-db
     networks:
       - orders-network
+      - api-orders-to-product-network
 
   orders-db:
     image: mariadb:11.6.2
@@ -81,4 +83,6 @@ networks:
   product-network:
     driver: bridge
   orders-network:
+    driver: bridge
+  api-orders-to-product-network:
     driver: bridge
