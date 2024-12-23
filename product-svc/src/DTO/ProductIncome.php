@@ -4,7 +4,7 @@ namespace App\DTO;
 
 use Symfony\Component\Uid\Uuid;
 
-class Product
+class ProductIncome
 {
     public function __construct(
         public readonly Uuid $id,
