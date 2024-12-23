@@ -30,4 +30,16 @@ class ProductRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
+
+    public function getOneWithInventory($id): ?Product
+    {
+        return $this->createQueryBuilder('p')
+            ->join('p.inventory', 'iry')
+            ->select('p, iry')
+            ->where('p.id = :id')
+            ->setParameter(':id', $id)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 }

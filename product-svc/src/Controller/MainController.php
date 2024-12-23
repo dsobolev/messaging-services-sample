@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Uid\Uuid;
 
 class MainController extends AbstractController
 {
@@ -26,12 +27,37 @@ class MainController extends AbstractController
         $products = $this->em->getRepository(Product::class)->getAll();
 
         $data = array_map(
-            fn ($product) => $this->extractor->extractProductData($product),
+            fn ($product) => $this->extractor->productDataWithIncome($product),
             $products
         );
 
         return $this->json([
             'data' => $data
+        ]);
+    }
+
+    #[Route('/products/{uuid}', methods: ['GET'], name: 'get_product', format: 'json')]
+    public function single(DataExtractor $extractor, string $uuid): JsonResponse
+    {
+        if (! Uuid::isValid($uuid)) {
+
+            return $this->json([
+                'message' => 'Invalid product id format'
+            ], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        $productId = Uuid::fromString($uuid);
+        $product = $this->em->getRepository(Product::class)->find($productId);
+
+        if (is_null($product)) {
+
+            return $this->json([
+                'message' => 'Product not found'
+            ], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        return $this->json([
+            'data' => $this->extractor->productData($product)
         ]);
     }
 
@@ -54,7 +80,7 @@ class MainController extends AbstractController
         $this->em->flush();
 
         return $this->json(
-            $this->extractor->extractProductData($product)
+            $this->extractor->productDataWithIncome($product)
         );
     }
 }

@@ -1,10 +1,15 @@
+@product_api_url=product.svc.local
 @product_port=8081
 
 ### Get products
-GET http://product.svc.local:{{product_port}}/products
+GET http://{{product_api_url}}:{{product_port}}/products
+
+### Get single product (without income)
+@product_id=0193ea09-6191-7c09-a4b5-fa788d7a47c3
+GET http://{{product_api_url}}:{{product_port}}/products/{{product_id}}
 
 ### Create product
-POST http://product.svc.local:{{product_port}}/products
+POST http://{{product_api_url}}:{{product_port}}/products
 content-type: application/json
 
 {
