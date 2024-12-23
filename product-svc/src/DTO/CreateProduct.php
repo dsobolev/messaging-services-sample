@@ -23,6 +23,6 @@ class CreateProduct
 
         #[Assert\NotBlank]
         #[Assert\Positive]
-        public readonly float $qty
+        public readonly int $qty
     ){}
 }
