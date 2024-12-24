@@ -43,4 +43,14 @@ class ProductApiClient
 
         return $result;
     }
+
+    public function updateProductInventory(Uuid $productId, int $qty): bool
+    {
+        $response = $this->client->request(
+            'PUT',
+            $this->productApiHost . '/products/' . $id, [
+                'body' => [ "qty" => $qty ]
+            ]
+        );
+    }
 }
