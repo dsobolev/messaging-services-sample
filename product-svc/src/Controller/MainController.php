@@ -37,7 +37,7 @@ class MainController extends AbstractController
     }
 
     #[Route('/products/{uuid}', methods: ['GET'], name: 'get_product', format: 'json')]
-    public function single(DataExtractor $extractor, string $uuid): JsonResponse
+    public function single(string $uuid): JsonResponse
     {
         if (! Uuid::isValid($uuid)) {
 
@@ -47,7 +47,7 @@ class MainController extends AbstractController
         }
 
         $productId = Uuid::fromString($uuid);
-        $product = $this->em->getRepository(Product::class)->find($productId);
+        $product = $this->em->getRepository(Product::class)->getOneWithInventory($productId);
 
         if (is_null($product)) {
 

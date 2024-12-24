@@ -22,7 +22,7 @@ class Product
     #[ORM\Column(length: 30)]
     private string $name;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(inversedBy: 'product', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
     private Inventory $inventory;
 

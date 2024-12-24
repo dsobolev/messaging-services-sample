@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Product;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * @extends ServiceEntityRepository<Product>
@@ -31,13 +32,13 @@ class ProductRepository extends ServiceEntityRepository
         ;
     }
 
-    public function getOneWithInventory($id): ?Product
+    public function getOneWithInventory(Uuid $id): ?Product
     {
         return $this->createQueryBuilder('p')
             ->join('p.inventory', 'iry')
             ->select('p, iry')
             ->where('p.id = :id')
-            ->setParameter(':id', $id)
+            ->setParameter('id', $id->toBinary())
             ->getQuery()
             ->getOneOrNullResult()
         ;

@@ -16,6 +16,9 @@ class Inventory
     #[ORM\Column]
     private ?int $qty = null;
 
+    #[ORM\OneToOne(mappedBy: 'inventory')]
+    private Product $product;
+
     public function getId(): ?int
     {
         return $this->id;
