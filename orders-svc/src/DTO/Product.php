@@ -10,6 +10,11 @@ class Product
         public readonly Uuid $id,
         public readonly string $name,
         public readonly float $price,
-        public readonly int $qty
+        public int $qty
     ){}
+
+    public function setQty(int $value): void
+    {
+        $this->qty = $value;
+    }
 }

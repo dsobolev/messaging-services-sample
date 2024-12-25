@@ -48,9 +48,12 @@ class ProductApiClient
     {
         $response = $this->client->request(
             'PUT',
-            $this->productApiHost . '/products/' . $id, [
+            $this->productApiHost . '/products/' . $productId, [
                 'body' => [ "qty" => $qty ]
             ]
         );
+
+        return 200 === $response->getStatusCode();
+        // ??? log message if not successful ???
     }
 }

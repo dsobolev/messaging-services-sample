@@ -1,11 +1,14 @@
-@product_api_url=product.svc.local
+@product_api_url=http://product.svc.local
 @product_port=8081
 
+@orders_api_url=http://orders.svc.local
+@orders_port=8082
+
 ### Get products
-GET http://{{product_api_url}}:{{product_port}}/products
+GET {{product_api_url}}:{{product_port}}/products
 
 ### Create product
-POST http://{{product_api_url}}:{{product_port}}/products
+POST {{product_api_url}}:{{product_port}}/products
 content-type: application/json
 
 {
@@ -16,12 +19,21 @@ content-type: application/json
 
 ### Get single product (without income)
 @product_id=0193ea09-6191-7c09-a4b5-fa788d7a47c3
-GET http://{{product_api_url}}:{{product_port}}/products/{{product_id}}
+GET {{product_api_url}}:{{product_port}}/products/{{product_id}}
 
 ### Change Inventory
-PUT http://{{product_api_url}}:{{product_port}}/products/{{product_id}}
+PUT {{product_api_url}}:{{product_port}}/products/{{product_id}}
 content-type: application/json
 
 {
     "qty": 20
+}
+
+### Make Order
+POST {{orders_api_url}}:{{orders_port}}/orders
+content-type: application/json
+
+{
+    "product": "0193ea09-6191-7c09-a4b5-fa788d7a47c3",
+    "qty": 1
 }
