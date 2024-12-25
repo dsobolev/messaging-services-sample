@@ -22,10 +22,30 @@ class MainController extends AbstractController
         private ProductApiClient $api
     ) {}
 
+    #[Route('/orders', name: 'list_orders', format: 'json')]
+    public function index(): JsonResponse
+    {
+        $orders = $this->em->getRepository(Order::class)->findAll();
+
+        $data = [];
+        foreach ($orders as $order) {
+            /** @var ApiProductResponse */
+            $productApiResult = $this->api->getProduct($order->getProductId());
+
+            /** @var App\DTO\Product */
+            $product = $productApiResult->product;
+
+            $data[] = $this->formatter->orderData($order, $product);
+        }
+
+        return $this->json([
+            'data' => $data
+        ]);
+    }
+
     #[Route('/orders', methods: ['POST'], name: 'create_order', format: 'json')]
     public function create(
         #[MapRequestPayload] OrderPayloadDTO $payload
-        // \Symfony\Component\HttpFoundation\Request $request
     ): JsonResponse
     {
         $id = Uuid::fromString($payload->product);
