@@ -24,6 +24,7 @@ ps:
 
 ## ------------ Product ---------------- ##
 product-install:
+	make orders-composer c="install"
 	make product-sf c="doctrine:migrations:migrate"
 	make product-sf c="doctrine:fixtures:load"
 
