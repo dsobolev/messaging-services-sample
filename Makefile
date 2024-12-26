@@ -1,11 +1,13 @@
 DOCKER_COMP = docker compose
 
 PRODUCT_PHP_CONT = $(DOCKER_COMP) exec product-app
-PRODUCT_APP_PHP = $(PRODUCT_PHP_CONT) php
+PRODUCT_APP_PHP  = $(PRODUCT_PHP_CONT) php
+PRODUCT_COMPOSER = $(PRODUCT_PHP_CONT) composer
 PRODUCT_CONSOLE  = $(PRODUCT_APP_PHP) bin/console
 
 ORDERS_PHP_CONT = $(DOCKER_COMP) exec orders-app
-ORDERS_APP_PHP = $(ORDERS_PHP_CONT) php
+ORDERS_APP_PHP  = $(ORDERS_PHP_CONT) php
+ORDERS_COMPOSER = $(ORDERS_PHP_CONT) composer
 ORDERS_CONSOLE  = $(ORDERS_APP_PHP) bin/console
 
 .PHONY: product-sf start
@@ -38,10 +40,15 @@ product-sf:
 	@$(eval c ?=)
 	@$(PRODUCT_CONSOLE) $(c)
 
+## make product-composer c="require package/name"
+product-composer:
+	@$(eval c ?=)
+	@$(PRODUCT_COMPOSER) $(c)
+
 
 ## ------------- Orders ---------------- ##
 orders-install:
-	cd orders-svc && composer install
+	make orders-composer c="install"
 	make orders-sf c="doctrine:migrations:migrate"
 
 orders-shell-db:
@@ -54,3 +61,8 @@ orders-shell-app:
 orders-sf:
 	@$(eval c ?=)
 	@$(ORDERS_CONSOLE) $(c)
+
+## See usage for `product-composer`
+orders-composer:
+	@$(eval c ?=)
+	@$(ORDERS_COMPOSER) $(c)
