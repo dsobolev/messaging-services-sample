@@ -26,7 +26,7 @@ class Product
     #[ORM\JoinColumn(nullable: false)]
     private Inventory $inventory;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(inversedBy: 'product', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: true)]
     private ?Income $income = null;
 

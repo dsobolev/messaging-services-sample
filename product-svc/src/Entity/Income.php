@@ -16,6 +16,9 @@ class Income
     #[ORM\Column]
     private ?float $income = null;
 
+    #[ORM\OneToOne(mappedBy: 'income')]
+    private Product $product;
+
     public function getId(): ?int
     {
         return $this->id;
