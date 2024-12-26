@@ -45,6 +45,9 @@ product-composer:
 	@$(eval c ?=)
 	@$(PRODUCT_COMPOSER) $(c)
 
+product-queue:
+	make product-sf c="messenger:consume async -vv"
+
 
 ## ------------- Orders ---------------- ##
 orders-install:
@@ -66,3 +69,6 @@ orders-sf:
 orders-composer:
 	@$(eval c ?=)
 	@$(ORDERS_COMPOSER) $(c)
+
+orders-queue:
+	make orders-sf c="messenger:consume async -vv"
