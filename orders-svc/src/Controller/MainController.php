@@ -6,6 +6,7 @@ use App\DTO\ApiProductResponse;
 use App\DTO\MakeOrder as OrderPayloadDTO;
 use App\Entity\Order;
 use App\Service\Formatter;
+use App\Service\OrdersService;
 use App\Service\ProductApiClient;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,15 +18,16 @@ use Symfony\Component\Uid\Uuid;
 class MainController extends AbstractController
 {
     public function __construct(
-        private EntityManagerInterface $em,
         private Formatter $formatter,
         private ProductApiClient $api
     ) {}
 
-    #[Route('/orders', name: 'list_orders', format: 'json')]
-    public function index(): JsonResponse
+    #[Route('/orders', methods: ['GET'], name: 'list_orders', format: 'json')]
+    public function index(
+        EntityManagerInterface $em
+    ): JsonResponse
     {
-        $orders = $this->em->getRepository(Order::class)->findAll();
+        $orders = $em->getRepository(Order::class)->findAll();
 
         $data = [];
         foreach ($orders as $order) {
@@ -45,11 +47,11 @@ class MainController extends AbstractController
 
     #[Route('/orders', methods: ['POST'], name: 'create_order', format: 'json')]
     public function create(
-        #[MapRequestPayload] OrderPayloadDTO $payload
+        #[MapRequestPayload] OrderPayloadDTO $payload,
+        OrdersService $orderMaker
     ): JsonResponse
     {
         $id = Uuid::fromString($payload->product);
-
         /** @var ApiProductResponse */
         $result = $this->api->getProduct($id);
 
@@ -76,10 +78,10 @@ class MainController extends AbstractController
             ], JsonResponse::HTTP_CONFLICT);
         }
 
-        $updateQty = $qtyAvailable - $qtyOrdered;
+        $updatedQty = $qtyAvailable - $qtyOrdered;
         $isQtyUpdateSuccessful = $this->api->updateProductInventory(
             productId: $product->id,
-            qty: $updateQty
+            qty: $updatedQty
         );
 
         if (! $isQtyUpdateSuccessful) {
@@ -88,22 +90,11 @@ class MainController extends AbstractController
             ], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $product->setQty($updateQty);
+        $product->setQty($updatedQty);
 
-        // -----
-        $amount = round($qtyOrdered * $product->price, 2);
-
-        $order = new Order();
-        $order
-            ->setProductId($product->id)
-            ->setQty($qtyOrdered)
-            ->setAmount($amount)
-        ;
-        $this->em->persist($order);
-        $this->em->flush();
+        $order = $orderMaker->makeOrder($product, $qtyOrdered);
 
         $orderData = $this->formatter->orderData($order, $product);
-        // ----- move to OrderService->makeOrder
 
         return $this->json($orderData);
     }
