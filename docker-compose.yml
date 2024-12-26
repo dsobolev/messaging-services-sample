@@ -22,6 +22,7 @@ services:
       - product-db
     networks:
       - product-network
+      - messages-network
 
   product-db:
     image: mariadb:11.6.2
@@ -62,6 +63,7 @@ services:
     networks:
       - orders-network
       - api-orders-to-product-network
+      - messages-network
 
   orders-db:
     image: mariadb:11.6.2
@@ -79,6 +81,16 @@ services:
     networks:
       - orders-network
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - 15672:15672
+      - 5672:5672
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - messages-network
+
 networks:
   product-network:
     driver: bridge
@@ -86,3 +98,8 @@ networks:
     driver: bridge
   api-orders-to-product-network:
     driver: bridge
+  messages-network:
+    driver: bridge
+
+volumes:
+  rabbitmq-data:
