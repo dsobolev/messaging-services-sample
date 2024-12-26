@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\DTO\ApiProductResponse;
 use App\DTO\MakeOrder as OrderPayloadDTO;
 use App\Entity\Order;
+use App\Message\UpdateProductIncome as ProductMessage;
 use App\Service\Formatter;
 use App\Service\OrdersService;
 use App\Service\ProductApiClient;
@@ -12,6 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Uid\Uuid;
 
@@ -48,7 +50,8 @@ class MainController extends AbstractController
     #[Route('/orders', methods: ['POST'], name: 'create_order', format: 'json')]
     public function create(
         #[MapRequestPayload] OrderPayloadDTO $payload,
-        OrdersService $orderMaker
+        OrdersService $orderMaker,
+        MessageBusInterface $bus,
     ): JsonResponse
     {
         $id = Uuid::fromString($payload->product);
@@ -91,11 +94,16 @@ class MainController extends AbstractController
         }
 
         $product->setQty($updatedQty);
-
         $order = $orderMaker->makeOrder($product, $qtyOrdered);
 
-        $orderData = $this->formatter->orderData($order, $product);
+        // TODO postPersist on orders might work
+        $bus->dispatch(new ProductMessage(
+            productId: $product->id,
+            income: $order->getAmount()
+        ));
 
-        return $this->json($orderData);
+        return $this->json(
+            $this->formatter->orderData($order, $product)
+        );
     }
 }
