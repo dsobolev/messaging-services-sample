@@ -7,6 +7,7 @@ use App\Entity\Inventory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Uid\Uuid;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,11 +28,9 @@ class InventoryController extends AbstractController
         #[MapRequestPayload] InventoryPayload $payload
     ): JsonResponse
     {
+        // NOTE! I do not use route Requirement for `id` cause I want a clear message about `invalid id format`.
         if (! Uuid::isValid($id)) {
-
-            return $this->json([
-                'message' => 'Invalid product id format'
-            ], JsonResponse::HTTP_BAD_REQUEST);
+            throw new BadRequestHttpException('Invalid product id format');
         }
 
         $productInventory = $this->em->getRepository(Inventory::class)

@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Uid\Uuid;
 
@@ -40,10 +41,7 @@ class MainController extends AbstractController
     public function single(string $uuid): JsonResponse
     {
         if (! Uuid::isValid($uuid)) {
-
-            return $this->json([
-                'message' => 'Invalid product id format'
-            ], JsonResponse::HTTP_BAD_REQUEST);
+            throw new BadRequestHttpException('Invalid product id format');
         }
 
         $productId = Uuid::fromString($uuid);
