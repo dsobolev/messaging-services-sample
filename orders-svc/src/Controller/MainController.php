@@ -13,6 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\HttpKernel\Exception;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Uid\Uuid;
@@ -59,9 +60,7 @@ class MainController extends AbstractController
         $result = $this->api->getProduct($id);
 
         if ($result->httpCode !== 200) {
-            return $this->json([
-                'message' => $result->message,
-            ], JsonResponse::HTTP_BAD_REQUEST);
+            throw new Exception\BadRequestHttpException($result->message);
         }
 
         /** @var App\DTO\Product */
@@ -69,16 +68,12 @@ class MainController extends AbstractController
 
         $qtyAvailable = $product->qty;
         if ($qtyAvailable === 0) {
-            return $this->json([
-                'message' => 'Product is out of stock',
-            ], JsonResponse::HTTP_BAD_REQUEST);
+            throw new Exception\BadRequestHttpException('Product is out of stock');
         }
 
         $qtyOrdered = $payload->qty;
         if ($qtyOrdered > $qtyAvailable) {
-            return $this->json([
-                'message' => "Not possible to order {$qtyOrdered} products. There are only {$qtyAvailable} in stock",
-            ], JsonResponse::HTTP_CONFLICT);
+            throw new Exception\ConflictHttpException("Not possible to order {$qtyOrdered} products. There are only {$qtyAvailable} in stock");
         }
 
         $updatedQty = $qtyAvailable - $qtyOrdered;
@@ -88,9 +83,7 @@ class MainController extends AbstractController
         );
 
         if (! $isQtyUpdateSuccessful) {
-            return $this->json([
-                'message' => "Can not update product inventory",
-            ], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
+            throw new Exception\UnprocessableEntityHttpException('Can not update product inventory');
         }
 
         $product->setQty($updatedQty);
