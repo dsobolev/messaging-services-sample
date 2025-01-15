@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Uid\Uuid;
 
@@ -48,10 +49,7 @@ class MainController extends AbstractController
         $product = $this->em->getRepository(Product::class)->getOneWithInventory($productId);
 
         if (is_null($product)) {
-
-            return $this->json([
-                'message' => 'Product not found'
-            ], JsonResponse::HTTP_NOT_FOUND);
+            throw new NotFoundHttpException('Product not found');
         }
 
         return $this->json([
