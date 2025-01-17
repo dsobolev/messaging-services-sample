@@ -73,3 +73,6 @@ orders-composer:
 
 orders-queue:
 	make orders-sf c="messenger:consume async -vv"
+
+orders-test:
+	@$(ORDERS_PHP_CONT) bin/phpunit
