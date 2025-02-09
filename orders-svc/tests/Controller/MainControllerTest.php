@@ -21,28 +21,10 @@ class MainControllerTest extends WebTestCase
     public function testProductOutOfStockResponse(): void
     {
         $client = static::createClient();
-        $container = static::getContainer();
 
         $productId = Uuid::v4();
-
-        $product = new Product(
-            id: $productId,
-            name: 'product #1',
-            price: 1.00,
-            qty: 0,
-        );
-
-        $productResponse = new ApiProductResponse(
-            httpCode: 200,
-            product: $product
-        );
-
-        $productApi = $this->prophesize(ProductApiClient::class);
-        $productApi
-            ->getProduct(Argument::type(Uuid::class))
-            ->willReturn($productResponse)
-        ;
-        $container->set(ProductApiClient::class, $productApi->reveal());
+        $qty = 0;
+        $this->setProductApiForProductQty($productId, $qty);
 
         $client->request('POST', '/orders', [
             'qty' => 20,
@@ -52,6 +34,40 @@ class MainControllerTest extends WebTestCase
         $this->assertResponseStatusCodeSame(400);
 
         $this->assertResponseText($client->getResponse(), 'Product is out of stock');
+    }
+
+    // public function testNotPossibleToOrderTheAmountGiven(): void
+    // {
+    //     $client = static::createClient();
+    // }
+
+    private function setProductApiForProductQty(Uuid $productId, int $productQty): void
+    {
+        $container = static::getContainer();
+
+        $productResponse = $this->buildProductApiResponseWithQty($productId, $productQty);
+
+        $productApi = $this->prophesize(ProductApiClient::class);
+        $productApi
+            ->getProduct(/*Argument::type(Uuid::class)*/$productId)
+            ->willReturn($productResponse)
+        ;
+        $container->set(ProductApiClient::class, $productApi->reveal());
+    }
+
+    private function buildProductApiResponseWithQty(Uuid $productId, int $productQty): ApiProductResponse
+    {
+        $product = new Product(
+            id: $productId,
+            name: 'product #1',
+            price: 1.00,
+            qty: $productQty,
+        );
+
+        return new ApiProductResponse(
+            httpCode: 200,
+            product: $product
+        );
     }
 
     private function assertResponseText(Response $response, string $message): void
